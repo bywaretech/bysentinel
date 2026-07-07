@@ -1,6 +1,6 @@
 {
   "name": "@bywaretech/bysentinel-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared types, redaction/secret-detection engine and fingerprinting for BySentinel",
   "license": "Apache-2.0",
   "repository": {
@@ -14,11 +14,15 @@
   },
   "keywords": [
     "bysentinel",
+    "bywaretech",
     "observability",
+    "monitoring",
     "redaction",
-    "pii",
     "secret-detection",
+    "pii",
+    "security",
     "fingerprint",
+    "incident-analysis",
     "ai-analysis"
   ],
   "type": "module",
