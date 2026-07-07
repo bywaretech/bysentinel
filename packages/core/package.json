@@ -1,0 +1,56 @@
+{
+  "name": "@bysentinel/core",
+  "version": "0.1.0",
+  "description": "Shared types, redaction/secret-detection engine and fingerprinting for BySentinel",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byware/bysentinel.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/byware/bysentinel/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/byware/bysentinel/issues"
+  },
+  "keywords": [
+    "bysentinel",
+    "observability",
+    "redaction",
+    "pii",
+    "secret-detection",
+    "fingerprint",
+    "ai-analysis"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist .turbo coverage"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

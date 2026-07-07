@@ -1,0 +1,63 @@
+services:
+  bysentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: bysentinel:local
+    restart: unless-stopped
+    expose:
+      - "4000"
+    environment:
+      # Local stack: allow the development defaults. The production compose runs
+      # with NODE_ENV=production, where the boot guard rejects those defaults.
+      NODE_ENV: development
+      COLLECTOR_HOST: 0.0.0.0
+      COLLECTOR_PORT: 4000
+      BYSENTINEL_DATA_DIR: /data
+      BYSENTINEL_API_KEYS: ${BYSENTINEL_API_KEYS:-bsk_local_dev_key}
+      BYSENTINEL_ADMIN_TOKEN: ${BYSENTINEL_ADMIN_TOKEN:-bs_admin_dev_token}
+      # Seeded once on first boot; change before install or rotate afterwards.
+      BYSENTINEL_DEFAULT_USER: ${BYSENTINEL_DEFAULT_USER:-bysentinel}
+      BYSENTINEL_DEFAULT_PASSWORD: ${BYSENTINEL_DEFAULT_PASSWORD:-adminbysentinel}
+      BYSENTINEL_AI_ENABLED: ${BYSENTINEL_AI_ENABLED:-false}
+      BYSENTINEL_AI_TIMEOUT_MS: ${BYSENTINEL_AI_TIMEOUT_MS:-20000}
+      BYSENTINEL_WEBHOOK_URLS: ${BYSENTINEL_WEBHOOK_URLS:-}
+      BYSENTINEL_WEBHOOK_SECRET: ${BYSENTINEL_WEBHOOK_SECRET:-bswhsec_change_me}
+      BYSENTINEL_WEBHOOK_TIMEOUT_MS: ${BYSENTINEL_WEBHOOK_TIMEOUT_MS:-3000}
+      COLLECTOR_RATE_LIMIT_PER_MINUTE: ${COLLECTOR_RATE_LIMIT_PER_MINUTE:-120}
+    volumes:
+      - bysentinel-data:/data
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dashboard
+    image: bysentinel-dashboard:local
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-4000}:3000"
+    environment:
+      NUXT_COLLECTOR_URL: http://bysentinel:4000
+      # Lets the dashboard proxy authenticate against the collector so
+      # username/password users can sign in. Rotate in production.
+      NUXT_ADMIN_TOKEN: ${BYSENTINEL_ADMIN_TOKEN:-bs_admin_dev_token}
+    depends_on:
+      - bysentinel
+
+  ministack:
+    image: ministackorg/ministack:latest
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      PERSIST_STATE: 1
+      LAMBDA_EXECUTOR: docker
+      DOCKER_NETWORK: ministack_default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/state:/tmp/ministack-state
+
+volumes:
+  bysentinel-data:

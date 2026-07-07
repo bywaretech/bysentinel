@@ -1,0 +1,7 @@
+{
+  "name": "rm-localstack-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Lambda de teste para rodar o SDK BySentinel no LocalStack"
+}

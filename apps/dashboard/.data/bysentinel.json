@@ -1,0 +1,11 @@
+{
+  "incidents": [],
+  "settings": {
+    "ai": {
+      "enabled": false,
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "timeoutMs": 20000
+    }
+  }
+}

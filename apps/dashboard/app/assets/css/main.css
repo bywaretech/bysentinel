@@ -1,0 +1,155 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  BySentinel design system — dark-locked, developer-tool aesthetic.
+  One accent (iris/indigo) for interactive surfaces; severity uses its own
+  semantic scale (red / amber / emerald / slate). No neon glows, off-black base.
+*/
+@theme inline {
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", "JetBrains Mono", monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --color-sev-critical: var(--sev-critical);
+  --color-sev-high: var(--sev-high);
+  --color-sev-medium: var(--sev-medium);
+  --color-sev-low: var(--sev-low);
+  --color-sev-pending: var(--sev-pending);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.7rem;
+
+  /* Light theme retained for completeness; the app ships dark-locked. */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.16 0.01 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.16 0.01 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0.01 265);
+  --primary: oklch(0.55 0.19 274);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.97 0.005 265);
+  --secondary-foreground: oklch(0.21 0.01 265);
+  --muted: oklch(0.97 0.005 265);
+  --muted-foreground: oklch(0.5 0.02 265);
+  --accent: oklch(0.96 0.01 274);
+  --accent-foreground: oklch(0.21 0.01 265);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.92 0.005 265);
+  --input: oklch(0.92 0.005 265);
+  --ring: oklch(0.55 0.19 274);
+
+  --sidebar: oklch(0.98 0.003 265);
+  --sidebar-foreground: oklch(0.3 0.01 265);
+  --sidebar-border: oklch(0.92 0.005 265);
+
+  --sev-critical: oklch(0.62 0.23 20);
+  --sev-high: oklch(0.66 0.2 32);
+  --sev-medium: oklch(0.76 0.15 78);
+  --sev-low: oklch(0.68 0.15 155);
+  --sev-pending: oklch(0.6 0.02 265);
+}
+
+.dark {
+  /* off-black warm-cool neutral base, iris accent */
+  --background: oklch(0.16 0.008 265);
+  --foreground: oklch(0.95 0.005 265);
+  --card: oklch(0.19 0.009 265);
+  --card-foreground: oklch(0.95 0.005 265);
+  --popover: oklch(0.2 0.009 265);
+  --popover-foreground: oklch(0.95 0.005 265);
+  --primary: oklch(0.66 0.17 274);
+  --primary-foreground: oklch(0.15 0.02 274);
+  --secondary: oklch(0.24 0.01 265);
+  --secondary-foreground: oklch(0.95 0.005 265);
+  --muted: oklch(0.24 0.01 265);
+  --muted-foreground: oklch(0.66 0.015 265);
+  --accent: oklch(0.27 0.02 274);
+  --accent-foreground: oklch(0.96 0.005 265);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.28 0.01 265 / 0.7);
+  --input: oklch(0.3 0.012 265);
+  --ring: oklch(0.66 0.17 274);
+
+  --sidebar: oklch(0.17 0.008 265);
+  --sidebar-foreground: oklch(0.72 0.015 265);
+  --sidebar-border: oklch(0.26 0.01 265 / 0.7);
+
+  --sev-critical: oklch(0.68 0.2 20);
+  --sev-high: oklch(0.72 0.17 38);
+  --sev-medium: oklch(0.8 0.14 82);
+  --sev-low: oklch(0.72 0.15 158);
+  --sev-pending: oklch(0.62 0.015 265);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+  /* Refined scrollbars for the data-heavy surfaces */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+/* Subtle top-loading shimmer used on skeletons */
+@keyframes bs-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

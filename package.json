@@ -1,0 +1,60 @@
+{
+  "name": "bysentinel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered debugging and security layer for serverless applications",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byware/bysentinel.git"
+  },
+  "homepage": "https://github.com/byware/bysentinel#readme",
+  "bugs": {
+    "url": "https://github.com/byware/bysentinel/issues"
+  },
+  "keywords": [
+    "aws-lambda",
+    "serverless",
+    "observability",
+    "ai",
+    "debugging",
+    "security",
+    "incident-response",
+    "redaction"
+  ],
+  "packageManager": "pnpm@9.6.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "packages/providers/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "security:scan": "pnpm audit --audit-level=high && gitleaks detect --no-banner || true",
+    "docker:build": "docker build -t bysentinel:local .",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "smoke:collector": "node scripts/smoke-collector.mjs",
+    "smoke:e2e": "node scripts/smoke-e2e.mjs",
+    "release:pack": "node scripts/release-pack.mjs",
+    "db:migrate": "pnpm --filter @bysentinel/collector db:migrate",
+    "db:generate": "pnpm --filter @bysentinel/collector db:generate"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "^3.3.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "@bysentinel/providers",
+  "version": "0.1.0",
+  "description": "AI provider implementations for BySentinel",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byware/bysentinel.git",
+    "directory": "packages/providers"
+  },
+  "homepage": "https://github.com/byware/bysentinel/tree/main/packages/providers#readme",
+  "bugs": {
+    "url": "https://github.com/byware/bysentinel/issues"
+  },
+  "keywords": [
+    "bysentinel",
+    "openai",
+    "openrouter",
+    "anthropic",
+    "ollama",
+    "ai-provider",
+    "incident-analysis"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist .turbo coverage"
+  },
+  "dependencies": {
+    "@bysentinel/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@bysentinel/example-aws-lambda-node",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Example AWS Lambda handler instrumented with BySentinel",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "invoke:local": "node --experimental-vm-modules ./scripts/invoke-local.mjs",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@bysentinel/aws-lambda": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.140",
+    "typescript": "^5.5.0"
+  }
+}

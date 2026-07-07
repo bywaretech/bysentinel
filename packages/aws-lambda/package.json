@@ -1,0 +1,61 @@
+{
+  "name": "@bysentinel/aws-lambda",
+  "version": "0.1.0",
+  "description": "BySentinel SDK for AWS Lambda handlers (TypeScript/Node.js)",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byware/bysentinel.git",
+    "directory": "packages/aws-lambda"
+  },
+  "homepage": "https://github.com/byware/bysentinel/tree/main/packages/aws-lambda#readme",
+  "bugs": {
+    "url": "https://github.com/byware/bysentinel/issues"
+  },
+  "keywords": [
+    "bysentinel",
+    "aws-lambda",
+    "lambda",
+    "serverless",
+    "observability",
+    "ai-debugging",
+    "error-tracking",
+    "security"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist .turbo coverage"
+  },
+  "dependencies": {
+    "@bysentinel/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.140",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

@@ -1,0 +1,23 @@
+{$BYSENTINEL_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+	}
+
+	# SDK ingest + health go straight to the collector.
+	@collector path /v1/* /health
+	handle @collector {
+		reverse_proxy bysentinel:4000
+	}
+
+	# Everything else is the dashboard. It proxies the admin API internally
+	# to the collector, so the admin token never crosses the public edge.
+	handle {
+		reverse_proxy dashboard:3000
+	}
+}

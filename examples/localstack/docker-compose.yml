@@ -1,0 +1,17 @@
+services:
+  localstack:
+    image: localstack/localstack:3
+    container_name: bysentinel-localstack
+    ports:
+      - "4566:4566" # edge port (todos os serviços AWS emulados)
+    environment:
+      - SERVICES=lambda,iam,logs
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=30
+      - DEBUG=0
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    extra_hosts:
+      # Permite que a Lambda (container) alcance um receiver rodando no host
+      # via http://host.docker.internal:<porta>. No Docker Desktop (mac/win) já
+      # existe; no Linux esta linha garante o mapeamento.
+      - "host.docker.internal:host-gateway"

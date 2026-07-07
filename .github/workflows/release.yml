@@ -1,0 +1,118 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_npm:
+        description: "Publish npm packages"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+      publish_docker:
+        description: "Publish Docker image to GHCR"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  packages:
+    name: Build and pack npm packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.6.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Pack
+        run: pnpm release:pack
+
+      - name: Upload package tarballs
+        uses: actions/upload-artifact@v4
+        with:
+          name: bysentinel-npm-packages
+          path: dist-packs/*.tgz
+          if-no-files-found: error
+
+      - name: Publish npm packages
+        if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish_npm == 'true'
+        run: |
+          pnpm --filter @bysentinel/core publish --access public --provenance --no-git-checks
+          pnpm --filter @bysentinel/providers publish --access public --provenance --no-git-checks
+          pnpm --filter @bysentinel/aws-lambda publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  docker:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=tag
+            type=sha,prefix=sha-
+
+      - name: Login to GHCR
+        if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish_docker == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish_docker == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

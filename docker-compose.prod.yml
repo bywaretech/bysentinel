@@ -1,0 +1,84 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - bysentinel
+      - dashboard
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      BYSENTINEL_DOMAIN: ${BYSENTINEL_DOMAIN:?set BYSENTINEL_DOMAIN}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+  bysentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: bysentinel:local
+    restart: unless-stopped
+    expose:
+      - "4000"
+    environment:
+      # Enables the boot guard: the collector refuses to start with the known
+      # development defaults for the admin token, API keys or seeded password.
+      NODE_ENV: production
+      COLLECTOR_HOST: 0.0.0.0
+      COLLECTOR_PORT: 4000
+      COLLECTOR_CORS_ORIGINS: https://${BYSENTINEL_DOMAIN}
+      COLLECTOR_RATE_LIMIT_PER_MINUTE: ${COLLECTOR_RATE_LIMIT_PER_MINUTE:-120}
+      BYSENTINEL_DATA_DIR: /data
+      BYSENTINEL_API_KEYS: ${BYSENTINEL_API_KEYS:?set BYSENTINEL_API_KEYS}
+      BYSENTINEL_ADMIN_TOKEN: ${BYSENTINEL_ADMIN_TOKEN:?set BYSENTINEL_ADMIN_TOKEN}
+      # Seeded once on first boot; sign in and rotate it from the dashboard.
+      BYSENTINEL_DEFAULT_USER: ${BYSENTINEL_DEFAULT_USER:-bysentinel}
+      BYSENTINEL_DEFAULT_PASSWORD: ${BYSENTINEL_DEFAULT_PASSWORD:?set BYSENTINEL_DEFAULT_PASSWORD}
+      BYSENTINEL_AI_ENABLED: ${BYSENTINEL_AI_ENABLED:-false}
+      BYSENTINEL_AI_TIMEOUT_MS: ${BYSENTINEL_AI_TIMEOUT_MS:-20000}
+      BYSENTINEL_WEBHOOK_URLS: ${BYSENTINEL_WEBHOOK_URLS:-}
+      BYSENTINEL_WEBHOOK_SECRET: ${BYSENTINEL_WEBHOOK_SECRET:?set BYSENTINEL_WEBHOOK_SECRET}
+      BYSENTINEL_WEBHOOK_TIMEOUT_MS: ${BYSENTINEL_WEBHOOK_TIMEOUT_MS:-3000}
+    volumes:
+      - bysentinel-data:/data
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dashboard
+    image: bysentinel-dashboard:local
+    restart: unless-stopped
+    ports: !reset []
+    expose:
+      - "3000"
+    environment:
+      NUXT_COLLECTOR_URL: http://bysentinel:4000
+      NUXT_ADMIN_TOKEN: ${BYSENTINEL_ADMIN_TOKEN:?set BYSENTINEL_ADMIN_TOKEN}
+    depends_on:
+      - bysentinel
+
+  # Local AWS-compatible sandbox used to reproduce incidents. Internal only:
+  # never exposed through Caddy.
+  ministack:
+    image: ministackorg/ministack:latest
+    restart: unless-stopped
+    ports: !reset []
+    expose:
+      - "4566"
+    environment:
+      PERSIST_STATE: 1
+      LAMBDA_EXECUTOR: docker
+      DOCKER_NETWORK: ${BYSENTINEL_DOCKER_NETWORK:-bysentinel_default}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/state:/tmp/ministack-state
+
+volumes:
+  bysentinel-data:
+  caddy-data:
+  caddy-config:
