@@ -7,6 +7,8 @@ dist/
 dist-packs/
 build/
 .next/
+.nuxt/
+.output/
 out/
 *.tsbuildinfo
 
@@ -22,8 +24,18 @@ coverage/
 .env.*
 !.env.example
 data/
+.data/
 *.pem
 *.key
+
+# Local assistant / workspace notes
+.claude/
+.cursor/
+.windsurf/
+.codex/
+CLAUDE.md
+AGENTS.md
+STATUS.md
 
 # Logs
 *.log
