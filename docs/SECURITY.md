@@ -1,7 +1,7 @@
 # BySentinel Security
 
 Security is the core design constraint, not an add-on. This document describes
-the guarantees implemented today in `@bysentinel/core` and `@bysentinel/aws-lambda`.
+the guarantees implemented today in `@bywaretech/bysentinel-core` and `@bywaretech/bysentinel-aws-lambda`.
 
 ## 1. Two-layer sanitization
 
@@ -12,7 +12,7 @@ the guarantees implemented today in `@bysentinel/core` and `@bysentinel/aws-lamb
 
 The collector will **reject** events with `sanitized: false`.
 
-## 2. Redaction engine (`@bysentinel/core`)
+## 2. Redaction engine (`@bywaretech/bysentinel-core`)
 
 `redact(value, options)` deep-walks arbitrary objects/arrays (with cycle, depth
 and size guards) and applies two independent layers:

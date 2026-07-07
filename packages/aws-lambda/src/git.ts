@@ -1,4 +1,4 @@
-import type { GitContext } from "@bysentinel/core";
+import type { GitContext } from "@bywaretech/bysentinel-core";
 
 const pick = (...keys: string[]): string | undefined => {
   for (const k of keys) {

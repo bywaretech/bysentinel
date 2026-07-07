@@ -1,4 +1,4 @@
-import type { BySentinelEvent } from "@bysentinel/core";
+import type { BySentinelEvent } from "@bywaretech/bysentinel-core";
 import type { ResolvedOptions } from "./types.js";
 
 /**

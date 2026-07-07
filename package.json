@@ -47,8 +47,8 @@
     "smoke:collector": "node scripts/smoke-collector.mjs",
     "smoke:e2e": "node scripts/smoke-e2e.mjs",
     "release:pack": "node scripts/release-pack.mjs",
-    "db:migrate": "pnpm --filter @bysentinel/collector db:migrate",
-    "db:generate": "pnpm --filter @bysentinel/collector db:generate"
+    "db:migrate": "pnpm --filter @bywaretech/bysentinel-collector db:migrate",
+    "db:generate": "pnpm --filter @bywaretech/bysentinel-collector db:generate"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

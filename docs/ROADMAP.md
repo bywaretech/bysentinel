@@ -38,7 +38,7 @@ work · ⏳ future dedicated services/integrations.
 - **AI orchestration** — `analyzeIncident` builds the prompt, calls any
   `AIProvider`, validates the JSON, performs one schema-repair attempt and falls
   back to deterministic heuristics when provider output is unavailable or unsafe.
-- **Provider transports** — `@bysentinel/providers` implements OpenAI,
+- **Provider transports** — `@bywaretech/bysentinel-providers` implements OpenAI,
   OpenRouter, Anthropic, Ollama/local and custom HTTP without vendor SDK lock-in.
 - **Security signals** already detected in-SDK and passed to the analyzer (#9).
 

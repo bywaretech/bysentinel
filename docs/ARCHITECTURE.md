@@ -6,7 +6,7 @@ transports and a self-hosted collector.
 ```txt
 AWS Lambda
   |
-  | @bysentinel/aws-lambda
+  | @bywaretech/bysentinel-aws-lambda
   | sanitized event, background delivery
   v
 Collector API
@@ -24,11 +24,11 @@ External alerting / automation
 
 | Package                  | Responsibility                                                                             |
 | ------------------------ | ------------------------------------------------------------------------------------------ |
-| `@bysentinel/aws-lambda` | Handler wrapper, manual capture, timeline, Git metadata, bounded delivery.                 |
-| `@bysentinel/core`       | Types, redaction, security signals, fingerprinting, timeline and AI prompt/schema helpers. |
-| `@bysentinel/providers`  | Provider transports for OpenAI, OpenRouter, Anthropic, Ollama and custom HTTP.             |
-| `@bysentinel/collector`  | Ingest API, file storage, AI settings, analysis and webhooks.                              |
-| `@bysentinel/dashboard`  | Nuxt dashboard and same-origin Nitro proxy to the collector.                               |
+| `@bywaretech/bysentinel-aws-lambda` | Handler wrapper, manual capture, timeline, Git metadata, bounded delivery.                 |
+| `@bywaretech/bysentinel-core`       | Types, redaction, security signals, fingerprinting, timeline and AI prompt/schema helpers. |
+| `@bywaretech/bysentinel-providers`  | Provider transports for OpenAI, OpenRouter, Anthropic, Ollama and custom HTTP.             |
+| `@bywaretech/bysentinel-collector`  | Ingest API, file storage, AI settings, analysis and webhooks.                              |
+| `@bywaretech/bysentinel-dashboard`  | Nuxt dashboard and same-origin Nitro proxy to the collector.                               |
 
 ## Event flow
 

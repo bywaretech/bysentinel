@@ -1,4 +1,4 @@
-# @bysentinel/core
+# @bywaretech/bysentinel-core
 
 Shared, dependency-free building blocks for BySentinel. Used by the SDK,
 collector and worker.
@@ -22,7 +22,7 @@ collector and worker.
 ## Example
 
 ```ts
-import { redact, detectSecuritySignals, fingerprint } from "@bysentinel/core";
+import { redact, detectSecuritySignals, fingerprint } from "@bywaretech/bysentinel-core";
 
 const clean = redact({ authorization: "Bearer x.y.z", cpf: "123.456.789-09" });
 // { authorization: "[REDACTED_AUTHORIZATION]", cpf: "[REDACTED_CPF]" }

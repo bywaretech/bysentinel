@@ -1,4 +1,4 @@
-import { Timeline } from "@bysentinel/core";
+import { Timeline } from "@bywaretech/bysentinel-core";
 import { currentScope } from "./scope.js";
 
 /**

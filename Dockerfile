@@ -16,7 +16,7 @@ RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY . .
-RUN pnpm --filter @bysentinel/collector... build
+RUN pnpm --filter @bywaretech/bysentinel-collector... build
 
 # ---------------------------------------------------------------- collector
 FROM node:24-alpine AS runtime
@@ -36,7 +36,7 @@ CMD ["node", "apps/collector/dist/index.js"]
 # ---------------------------------------------------------------- dashboard
 FROM deps AS dashboard-build
 COPY . .
-RUN pnpm --filter @bysentinel/dashboard build
+RUN pnpm --filter @bywaretech/bysentinel-dashboard build
 
 FROM node:24-alpine AS dashboard
 ENV NODE_ENV=production

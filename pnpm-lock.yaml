@@ -26,10 +26,10 @@ importers:
 
   apps/collector:
     dependencies:
-      '@bysentinel/core':
+      '@bywaretech/bysentinel-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@bysentinel/providers':
+      '@bywaretech/bysentinel-providers':
         specifier: workspace:*
         version: link:../../packages/providers
     devDependencies:
@@ -88,7 +88,7 @@ importers:
 
   examples/aws-lambda-node:
     dependencies:
-      '@bysentinel/aws-lambda':
+      '@bywaretech/bysentinel-aws-lambda':
         specifier: workspace:*
         version: link:../../packages/aws-lambda
     devDependencies:
@@ -101,7 +101,7 @@ importers:
 
   packages/aws-lambda:
     dependencies:
-      '@bysentinel/core':
+      '@bywaretech/bysentinel-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -126,7 +126,7 @@ importers:
 
   packages/providers:
     dependencies:
-      '@bysentinel/core':
+      '@bywaretech/bysentinel-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

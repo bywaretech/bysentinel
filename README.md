@@ -35,7 +35,7 @@ It is built for teams that want useful incident analysis without sending raw
 production payloads to an opaque SaaS.
 
 ```ts
-import { withBySentinel, BySentinel } from "@bysentinel/aws-lambda";
+import { withBySentinel, BySentinel } from "@bywaretech/bysentinel-aws-lambda";
 
 export const handler = withBySentinel(
   async (event) => {
@@ -150,7 +150,7 @@ BySentinel is a self-hostable product you can run today.
 
 | Area                                                                      | Status  |
 | ------------------------------------------------------------------------- | ------- |
-| `@bysentinel/aws-lambda` SDK                                              | Done    |
+| `@bywaretech/bysentinel-aws-lambda` SDK                                              | Done    |
 | Redaction, fingerprinting and security signals                            | Done    |
 | AI prompt, schema validation and heuristic fallback                       | Done    |
 | OpenAI, OpenRouter, Anthropic, DeepSeek, Ollama and custom HTTP providers | Done    |
@@ -165,7 +165,7 @@ BySentinel is a self-hostable product you can run today.
 ## Architecture
 
 ```txt
-AWS Lambda ── @bysentinel/aws-lambda ──► Collector API (/v1/events)
+AWS Lambda ── @bywaretech/bysentinel-aws-lambda ──► Collector API (/v1/events)
                                               │  redacts, groups by fingerprint
                                               │  runs AI provider or heuristic
                                               ▼
@@ -236,13 +236,13 @@ http://host.docker.internal:11434
 ### 3. Install the Lambda SDK
 
 ```bash
-npm install @bysentinel/aws-lambda
+npm install @bywaretech/bysentinel-aws-lambda
 ```
 
 or:
 
 ```bash
-pnpm add @bysentinel/aws-lambda
+pnpm add @bywaretech/bysentinel-aws-lambda
 ```
 
 ### 4. Configure your Lambda
@@ -263,7 +263,7 @@ BYSENTINEL_API_KEY=bsk_local_dev_key
 ### 5. Wrap your handler
 
 ```ts
-import { withBySentinel } from "@bysentinel/aws-lambda";
+import { withBySentinel } from "@bywaretech/bysentinel-aws-lambda";
 
 async function paymentHandler(event) {
   const body = event.body ? JSON.parse(event.body) : {};
@@ -339,7 +339,7 @@ delivery: {
 Use `BySentinel.start()` to record meaningful steps inside an invocation.
 
 ```ts
-import { withBySentinel, BySentinel } from "@bysentinel/aws-lambda";
+import { withBySentinel, BySentinel } from "@bywaretech/bysentinel-aws-lambda";
 
 export const handler = withBySentinel(async (event) => {
   const rt = BySentinel.start();
@@ -366,7 +366,7 @@ is highlighted as the bottleneck.
 Manual capture is useful for handled errors, warnings and business context.
 
 ```ts
-import { captureException, captureMessage } from "@bysentinel/aws-lambda";
+import { captureException, captureMessage } from "@bywaretech/bysentinel-aws-lambda";
 
 try {
   await chargeCustomer();

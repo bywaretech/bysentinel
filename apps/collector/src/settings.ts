@@ -1,4 +1,4 @@
-import type { ProviderName } from "@bysentinel/providers";
+import type { ProviderName } from "@bywaretech/bysentinel-providers";
 
 export const AI_PROVIDERS = [
   "openai",

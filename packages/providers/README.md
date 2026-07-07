@@ -1,4 +1,4 @@
-# @bysentinel/providers
+# @bywaretech/bysentinel-providers
 
 HTTP provider implementations for BySentinel AI analysis.
 
@@ -13,13 +13,13 @@ HTTP provider implementations for BySentinel AI analysis.
 
 Providers only handle transport and normalize model responses into
 `AICompletionResult`. Prompting, schema validation, retry/repair and fallback
-logic live in `@bysentinel/core` via `analyzeIncident`.
+logic live in `@bywaretech/bysentinel-core` via `analyzeIncident`.
 
 ## Example
 
 ```ts
-import { analyzeIncident } from "@bysentinel/core";
-import { createProvider } from "@bysentinel/providers";
+import { analyzeIncident } from "@bywaretech/bysentinel-core";
+import { createProvider } from "@bywaretech/bysentinel-providers";
 
 const provider = createProvider({
   provider: "openai",

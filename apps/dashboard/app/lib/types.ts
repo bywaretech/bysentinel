@@ -1,4 +1,4 @@
-// Mirrors the collector API shapes (@bysentinel/core + collector storage).
+// Mirrors the collector API shapes (@bywaretech/bysentinel-core + collector storage).
 // Kept local so the dashboard has no build-time dependency on the collector.
 
 export type Severity = "low" | "medium" | "high" | "critical";

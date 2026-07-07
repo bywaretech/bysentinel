@@ -1,16 +1,16 @@
 {
-  "name": "@bysentinel/aws-lambda",
+  "name": "@bywaretech/bysentinel-aws-lambda",
   "version": "0.1.0",
-  "description": "BySentinel SDK for AWS Lambda handlers (TypeScript/Node.js)",
+  "description": "AI Runtime Monitoring SDK for AWS Lambda",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/byware/bysentinel.git",
+    "url": "git+https://github.com/bywaretech/bysentinel.git",
     "directory": "packages/aws-lambda"
   },
-  "homepage": "https://github.com/byware/bysentinel/tree/main/packages/aws-lambda#readme",
+  "homepage": "https://github.com/bywaretech/bysentinel/tree/main/packages/aws-lambda#readme",
   "bugs": {
-    "url": "https://github.com/byware/bysentinel/issues"
+    "url": "https://github.com/bywaretech/bysentinel/issues"
   },
   "keywords": [
     "bysentinel",
@@ -38,8 +38,7 @@
   ],
   "sideEffects": false,
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -51,7 +50,7 @@
     "clean": "rm -rf dist .turbo coverage"
   },
   "dependencies": {
-    "@bysentinel/core": "workspace:*"
+    "@bywaretech/bysentinel-core": "workspace:*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.140",
