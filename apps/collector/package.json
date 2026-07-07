@@ -1,5 +1,5 @@
 {
-  "name": "@bysentinel/collector",
+  "name": "@bywaretech/bysentinel-collector",
   "version": "0.1.0",
   "description": "BySentinel collector and analyzer API",
   "license": "Apache-2.0",
@@ -18,8 +18,8 @@
     "clean": "rm -rf dist .turbo coverage"
   },
   "dependencies": {
-    "@bysentinel/core": "workspace:*",
-    "@bysentinel/providers": "workspace:*"
+    "@bywaretech/bysentinel-core": "workspace:*",
+    "@bywaretech/bysentinel-providers": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

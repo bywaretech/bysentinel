@@ -1,16 +1,16 @@
 {
-  "name": "@bysentinel/core",
+  "name": "@bywaretech/bysentinel-core",
   "version": "0.1.0",
   "description": "Shared types, redaction/secret-detection engine and fingerprinting for BySentinel",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/byware/bysentinel.git",
+    "url": "git+https://github.com/bywaretech/bysentinel.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/byware/bysentinel/tree/main/packages/core#readme",
+  "homepage": "https://github.com/bywaretech/bysentinel/tree/main/packages/core#readme",
   "bugs": {
-    "url": "https://github.com/byware/bysentinel/issues"
+    "url": "https://github.com/bywaretech/bysentinel/issues"
   },
   "keywords": [
     "bysentinel",
@@ -37,8 +37,7 @@
   ],
   "sideEffects": false,
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

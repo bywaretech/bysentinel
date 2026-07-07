@@ -6,7 +6,7 @@ import {
   DEFAULT_SECURITY_OPTIONS,
   redact,
   type BySentinelEvent,
-} from "@bysentinel/core";
+} from "@bywaretech/bysentinel-core";
 import { analyzeRecord } from "./analyzer.js";
 import type { CollectorConfig } from "./config.js";
 import {

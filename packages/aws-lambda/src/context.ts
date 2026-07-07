@@ -1,4 +1,4 @@
-import type { LambdaContext, PerformanceInfo } from "@bysentinel/core";
+import type { LambdaContext, PerformanceInfo } from "@bywaretech/bysentinel-core";
 
 /** AWS Lambda `Context` — narrowed to what we use (avoids a hard dep). */
 export interface AwsLambdaContextLike {

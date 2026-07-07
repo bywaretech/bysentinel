@@ -1,5 +1,5 @@
 {
-  "name": "@bysentinel/example-aws-lambda-node",
+  "name": "@bywaretech/bysentinel-example-aws-lambda-node",
   "version": "0.1.0",
   "private": true,
   "description": "Example AWS Lambda handler instrumented with BySentinel",
@@ -13,7 +13,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@bysentinel/aws-lambda": "workspace:*"
+    "@bywaretech/bysentinel-aws-lambda": "workspace:*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.140",

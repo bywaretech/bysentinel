@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import type { Timeline } from "@bysentinel/core";
+import type { Timeline } from "@bywaretech/bysentinel-core";
 import type { AwsLambdaContextLike } from "./context.js";
 import type { ResolvedOptions } from "./types.js";
 

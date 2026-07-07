@@ -1,4 +1,4 @@
-import { withBySentinel, BySentinel } from "@bysentinel/aws-lambda";
+import { withBySentinel, BySentinel } from "@bywaretech/bysentinel-aws-lambda";
 
 /** Processador de pagamento fake: falha acima de 10.000. */
 async function processPayment(body) {

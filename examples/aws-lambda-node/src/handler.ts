@@ -4,7 +4,7 @@ import {
   captureException,
   captureMessage,
   BySentinel,
-} from "@bysentinel/aws-lambda";
+} from "@bywaretech/bysentinel-aws-lambda";
 
 /** Pretend payment processor that fails on a specific amount. */
 async function processPayment(body: unknown): Promise<{ id: string; status: string }> {

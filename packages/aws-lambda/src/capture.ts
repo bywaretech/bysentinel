@@ -1,4 +1,4 @@
-import type { CaptureContext } from "@bysentinel/core";
+import type { CaptureContext } from "@bywaretech/bysentinel-core";
 import { markCaptured } from "./dedupe.js";
 import { buildEvent } from "./event.js";
 import { resolveOptions } from "./options.js";

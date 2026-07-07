@@ -1,4 +1,4 @@
-import type { ProviderName } from "@bysentinel/providers";
+import type { ProviderName } from "@bywaretech/bysentinel-providers";
 import { defaultModel, type AISettings } from "./settings.js";
 
 /**

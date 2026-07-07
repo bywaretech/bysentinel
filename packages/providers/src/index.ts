@@ -3,7 +3,7 @@ import type {
   AICompletionResult,
   AIProvider,
   ProviderConfig,
-} from "@bysentinel/core";
+} from "@bywaretech/bysentinel-core";
 
 export type ProviderName =
   "openai" | "openrouter" | "anthropic" | "deepseek" | "ollama" | "custom-http";

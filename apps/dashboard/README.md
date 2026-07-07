@@ -1,4 +1,4 @@
-# @bysentinel/dashboard
+# @bywaretech/bysentinel-dashboard
 
 A dedicated, high-end dashboard for BySentinel, built with **Nuxt 4 + Tailwind v4 + shadcn-vue** (reka-ui).
 It replaces the single-file HTML panel that used to live inside the collector.
@@ -40,7 +40,7 @@ Runtime config (env vars, all optional):
 ## Develop
 
 ```bash
-pnpm --filter @bysentinel/dashboard dev      # http://localhost:3000
+pnpm --filter @bywaretech/bysentinel-dashboard dev      # http://localhost:3000
 ```
 
 Point it at a running collector (see `apps/collector`). Sign in with that collector's
@@ -49,7 +49,7 @@ Point it at a running collector (see `apps/collector`). Sign in with that collec
 ## Build
 
 ```bash
-pnpm --filter @bysentinel/dashboard build
+pnpm --filter @bywaretech/bysentinel-dashboard build
 node apps/dashboard/.output/server/index.mjs  # serves the built app
 ```
 

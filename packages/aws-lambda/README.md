@@ -1,4 +1,4 @@
-# @bysentinel/aws-lambda
+# @bywaretech/bysentinel-aws-lambda
 
 BySentinel SDK for AWS Lambda handlers. Wraps your handler, captures sanitized
 incident data on failure, and delivers it to a collector — without ever breaking
@@ -7,7 +7,7 @@ your function.
 ## Install
 
 ```bash
-pnpm add @bysentinel/aws-lambda
+pnpm add @bywaretech/bysentinel-aws-lambda
 ```
 
 ## `withBySentinel(handler, options)`
@@ -18,7 +18,7 @@ original error**. On success it only emits an event when a performance risk
 (e.g. timeout) is detected.
 
 ```ts
-import { withBySentinel } from "@bysentinel/aws-lambda";
+import { withBySentinel } from "@bywaretech/bysentinel-aws-lambda";
 
 export const handler = withBySentinel(myHandler, {
   project: "payments-api",
@@ -95,7 +95,7 @@ Inside a wrapped handler, manual capture inherits the active project /
 environment / collector config automatically (via `AsyncLocalStorage`):
 
 ```ts
-import { captureException, captureMessage } from "@bysentinel/aws-lambda";
+import { captureException, captureMessage } from "@bywaretech/bysentinel-aws-lambda";
 
 try {
   await processPayment();
@@ -118,7 +118,7 @@ Because each step carries an absolute timestamp, it also serves as the
 chronological incident timeline.
 
 ```ts
-import { withBySentinel, BySentinel } from "@bysentinel/aws-lambda";
+import { withBySentinel, BySentinel } from "@bywaretech/bysentinel-aws-lambda";
 
 export const handler = withBySentinel(async (event) => {
   const runtime = BySentinel.start(); // or: startRuntime()
@@ -172,7 +172,7 @@ one incident.
   command injection, secrets in body/headers, scanner user-agents, admin-route
   access
 
-Everything is redacted by `@bysentinel/core` **before it leaves the process**.
+Everything is redacted by `@bywaretech/bysentinel-core` **before it leaves the process**.
 See [docs/SECURITY.md](../../docs/SECURITY.md).
 
 ## Guarantees

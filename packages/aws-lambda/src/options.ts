@@ -1,4 +1,4 @@
-import { DEFAULT_CAPTURE_OPTIONS, DEFAULT_SECURITY_OPTIONS } from "@bysentinel/core";
+import { DEFAULT_CAPTURE_OPTIONS, DEFAULT_SECURITY_OPTIONS } from "@bywaretech/bysentinel-core";
 import { resolveGitContext } from "./git.js";
 import type { ResolvedOptions, BySentinelOptions } from "./types.js";
 

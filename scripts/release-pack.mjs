@@ -5,9 +5,9 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const outDir = resolve(root, "dist-packs");
 const packages = [
-  { name: "@bysentinel/core", dir: "packages/core" },
-  { name: "@bysentinel/providers", dir: "packages/providers" },
-  { name: "@bysentinel/aws-lambda", dir: "packages/aws-lambda" },
+  { name: "@bywaretech/bysentinel-core", dir: "packages/core" },
+  { name: "@bywaretech/bysentinel-providers", dir: "packages/providers" },
+  { name: "@bywaretech/bysentinel-aws-lambda", dir: "packages/aws-lambda" },
 ];
 
 await rm(outDir, { recursive: true, force: true });

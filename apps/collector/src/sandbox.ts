@@ -1,6 +1,6 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
-import type { BySentinelEvent } from "@bysentinel/core";
+import type { BySentinelEvent } from "@bywaretech/bysentinel-core";
 import type { GitRepositoryConfig } from "./gitops.js";
 
 export interface SandboxSettings {

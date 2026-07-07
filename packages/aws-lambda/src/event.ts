@@ -9,7 +9,7 @@ import {
   type RequestInfo,
   type BySentinelEvent,
   type SecuritySignal,
-} from "@bysentinel/core";
+} from "@bywaretech/bysentinel-core";
 import { extractLambdaContext, type AwsLambdaContextLike } from "./context.js";
 import { extractRequest } from "./request.js";
 import type { ResolvedOptions } from "./types.js";

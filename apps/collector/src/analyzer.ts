@@ -4,8 +4,8 @@ import {
   DEFAULT_SECURITY_OPTIONS,
   redact,
   type BySentinelEvent,
-} from "@bysentinel/core";
-import { createProvider } from "@bysentinel/providers";
+} from "@bywaretech/bysentinel-core";
+import { createProvider } from "@bywaretech/bysentinel-providers";
 import type { AISettings } from "./settings.js";
 import type { IncidentRecord, StoredAnalysis } from "./storage.js";
 

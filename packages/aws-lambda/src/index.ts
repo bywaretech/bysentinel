@@ -17,4 +17,4 @@ export type {
   Timeline,
   ExecutionTimeline,
   TimelineStep,
-} from "@bysentinel/core";
+} from "@bywaretech/bysentinel-core";

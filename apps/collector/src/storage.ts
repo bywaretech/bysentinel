@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { AIAnalysisResult, BySentinelEvent } from "@bysentinel/core";
+import type { AIAnalysisResult, BySentinelEvent } from "@bywaretech/bysentinel-core";
 import type { GitSettings, SourceContext } from "./gitops.js";
 import type { SandboxSettings, SimulationRun } from "./sandbox.js";
 import type { AISettings } from "./settings.js";

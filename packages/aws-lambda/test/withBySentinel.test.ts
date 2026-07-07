@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { BySentinelEvent } from "@bysentinel/core";
+import type { BySentinelEvent } from "@bywaretech/bysentinel-core";
 import { withBySentinel } from "../src/withBySentinel.js";
 import { captureException } from "../src/capture.js";
 import { __resetColdStart } from "../src/context.js";

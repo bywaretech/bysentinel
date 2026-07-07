@@ -1,4 +1,4 @@
-import type { AIOptions, CaptureOptions, GitContext, SecurityOptions } from "@bysentinel/core";
+import type { AIOptions, CaptureOptions, GitContext, SecurityOptions } from "@bywaretech/bysentinel-core";
 
 export interface DeliveryOptions {
   /**

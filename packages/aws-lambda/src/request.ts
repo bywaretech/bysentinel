@@ -1,4 +1,4 @@
-import type { RequestInfo } from "@bysentinel/core";
+import type { RequestInfo } from "@bywaretech/bysentinel-core";
 import type { ResolvedOptions } from "./types.js";
 
 /**

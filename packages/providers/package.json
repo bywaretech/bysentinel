@@ -1,16 +1,16 @@
 {
-  "name": "@bysentinel/providers",
+  "name": "@bywaretech/bysentinel-providers",
   "version": "0.1.0",
   "description": "AI provider implementations for BySentinel",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/byware/bysentinel.git",
+    "url": "git+https://github.com/bywaretech/bysentinel.git",
     "directory": "packages/providers"
   },
-  "homepage": "https://github.com/byware/bysentinel/tree/main/packages/providers#readme",
+  "homepage": "https://github.com/bywaretech/bysentinel/tree/main/packages/providers#readme",
   "bugs": {
-    "url": "https://github.com/byware/bysentinel/issues"
+    "url": "https://github.com/bywaretech/bysentinel/issues"
   },
   "keywords": [
     "bysentinel",
@@ -37,8 +37,7 @@
   ],
   "sideEffects": false,
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -50,7 +49,7 @@
     "clean": "rm -rf dist .turbo coverage"
   },
   "dependencies": {
-    "@bysentinel/core": "workspace:*"
+    "@bywaretech/bysentinel-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
