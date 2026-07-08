@@ -215,6 +215,74 @@ describe("withBySentinel", () => {
     expect(calls.every((event) => event.sanitized)).toBe(true);
   });
 
+  it("applies per-webhook auth and extra headers", async () => {
+    const { requests } = mockFetch();
+    const handler = withBySentinel(
+      async () => {
+        throw new Error("auth");
+      },
+      {
+        project: "payments-api",
+        environment: "test",
+        delivery: {
+          webhooks: [
+            {
+              url: "https://webhook.example/basic",
+              auth: { type: "basic", username: "u", password: "p" },
+            },
+            { url: "https://webhook.example/bearer", auth: { type: "bearer", token: "tok" } },
+            {
+              url: "https://webhook.example/apikey",
+              auth: { type: "apiKey", value: "secret", header: "X-Custom-Key" },
+              headers: { "x-tenant": "acme" },
+            },
+          ],
+        },
+      },
+    );
+
+    await handler({}, ctx).catch(() => {});
+
+    const basic = requests.find((r) => r.url === "https://webhook.example/basic")!;
+    expect(basic.headers.authorization).toBe(`Basic ${Buffer.from("u:p").toString("base64")}`);
+
+    const bearer = requests.find((r) => r.url === "https://webhook.example/bearer")!;
+    expect(bearer.headers.authorization).toBe("Bearer tok");
+
+    const apiKey = requests.find((r) => r.url === "https://webhook.example/apikey")!;
+    expect(apiKey.headers["x-custom-key"]).toBe("secret");
+    expect(apiKey.headers["x-tenant"]).toBe("acme");
+    expect(apiKey.headers["x-bysentinel-delivery"]).toBe("sdk-webhook");
+  });
+
+  it("still accepts the legacy plain-string webhook form and can mix both", async () => {
+    const { requests } = mockFetch();
+    const handler = withBySentinel(
+      async () => {
+        throw new Error("mixed");
+      },
+      {
+        project: "payments-api",
+        environment: "test",
+        delivery: {
+          webhooks: [
+            "https://webhook.example/plain",
+            { url: "https://webhook.example/obj", auth: { type: "bearer", token: "t" } },
+          ],
+        },
+      },
+    );
+
+    await handler({}, ctx).catch(() => {});
+
+    expect(requests.map((r) => r.url)).toEqual([
+      "https://webhook.example/plain",
+      "https://webhook.example/obj",
+    ]);
+    expect(requests[0]!.headers.authorization).toBeUndefined();
+    expect(requests[1]!.headers.authorization).toBe("Bearer t");
+  });
+
   it("can deliver to direct webhooks without a collector", async () => {
     const { calls, requests } = mockFetch();
     const handler = withBySentinel(

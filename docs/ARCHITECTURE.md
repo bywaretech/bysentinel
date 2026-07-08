@@ -43,18 +43,38 @@ External alerting / automation
 
 ## Direct SDK webhooks
 
-The SDK can optionally fan out the sanitized event to direct webhook URLs with
-`delivery.webhooks` or `BYSENTINEL_DIRECT_WEBHOOK_URLS`.
+The SDK can optionally fan out the sanitized event to one or more direct webhook
+targets with `delivery.webhooks` or `BYSENTINEL_DIRECT_WEBHOOK_URLS`.
 
 ```txt
 AWS Lambda
   |\
-  | \ direct sanitized event
+  | \ direct sanitized event (N targets)
   |  v
-  | External webhook
+  | External webhook(s)
   v
 Collector API -> Dashboard/API -> signed collector webhook
 ```
+
+Each `delivery.webhooks` entry is either a plain URL string (legacy form) or a
+`WebhookConfig` object:
+
+```ts
+{
+  url: string;
+  auth?:
+    | { type: "basic"; username: string; password: string }
+    | { type: "bearer"; token: string }
+    | { type: "apiKey"; value: string; header?: string /* default x-api-key */ };
+  headers?: Record<string, string>;
+}
+```
+
+Auth is applied per target, so different webhooks can use different credentials.
+Reserved headers (`content-type`, `x-bysentinel-event-id`,
+`x-bysentinel-delivery`) and the auth header take precedence over any custom
+`headers`. `BYSENTINEL_DIRECT_WEBHOOK_URLS` remains URL-only; use the object form
+in code when a target needs authentication.
 
 Direct SDK webhooks are best for bootstrap/testing or parallel notification.
 Collector webhooks remain the richer production path because they include stored

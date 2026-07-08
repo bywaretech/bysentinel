@@ -391,7 +391,9 @@ creating a duplicate incident.
 
 The main production flow is SDK -> BySentinel collector -> dashboard -> signed
 collector webhooks. If you also want the initial sanitized event sent directly
-from the Lambda, add `delivery.webhooks`:
+from the Lambda, add `delivery.webhooks`. Each entry can be a plain URL string
+or an object with per-webhook authentication and extra headers, and you can
+configure as many targets as you need:
 
 ```ts
 export const handler = withBySentinel(myHandler, {
@@ -401,14 +403,50 @@ export const handler = withBySentinel(myHandler, {
   apiKey: process.env.BYSENTINEL_API_KEY,
   delivery: {
     timeoutMs: 5000,
-    webhooks: ["https://webhook.site/your-url"],
+    webhooks: [
+      // 1. Plain URL (legacy form, still supported).
+      "https://webhook.site/your-url",
+
+      // 2. HTTP Basic auth.
+      {
+        url: "https://ops.example.com/hooks/bysentinel",
+        auth: { type: "basic", username: "svc-bysentinel", password: process.env.HOOK_PASSWORD! },
+      },
+
+      // 3. Bearer token.
+      {
+        url: "https://api.pagerduty-proxy.example.com/ingest",
+        auth: { type: "bearer", token: process.env.PAGERDUTY_TOKEN! },
+      },
+
+      // 4. API key in a header (defaults to `x-api-key`) plus a custom header.
+      {
+        url: "https://gateway.example.com/events",
+        auth: { type: "apiKey", value: process.env.GATEWAY_KEY!, header: "X-Gateway-Key" },
+        headers: { "x-tenant": "acme" },
+      },
+    ],
   },
 });
 ```
 
+Authentication modes:
+
+| `auth.type` | Header sent                                    | Fields                          |
+| ----------- | ---------------------------------------------- | ------------------------------- |
+| `basic`     | `Authorization: Basic base64(user:pass)`       | `username`, `password`          |
+| `bearer`    | `Authorization: Bearer <token>`                | `token`                         |
+| `apiKey`    | `<header>: <value>` (default `x-api-key`)       | `value`, optional `header`      |
+
+Every direct webhook also receives `content-type: application/json`,
+`x-bysentinel-event-id`, and `x-bysentinel-delivery: sdk-webhook`. These
+reserved headers and the auth header always win over any custom `headers` you
+provide, so they cannot be accidentally overwritten.
+
 This is useful for teams that want BySentinel and an external receiver at the
 same time, or for webhook-only testing before running the dashboard. You can
-also set comma-separated URLs with `BYSENTINEL_DIRECT_WEBHOOK_URLS`.
+also set comma-separated URLs with `BYSENTINEL_DIRECT_WEBHOOK_URLS` (URL-only;
+use the object form in code when a webhook needs authentication).
 
 ### Git and release correlation
 

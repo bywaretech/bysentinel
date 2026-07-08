@@ -33,6 +33,20 @@ The SDK posts the same sanitized event to the collector and to each direct
 webhook URL. This is separate from collector outbound webhooks, which run after
 storage and analysis.
 
+To smoke-test authenticated targets, configure them in code with the object
+form (the env var is URL-only):
+
+```ts
+delivery: {
+  webhooks: [
+    { url: "https://webhook.site/your-url", auth: { type: "bearer", token: "test-token" } },
+  ],
+}
+```
+
+Then confirm on the receiver that the `Authorization` (or configured API-key)
+header arrived alongside `x-bysentinel-delivery: sdk-webhook`.
+
 ## Manual dashboard check
 
 1. Open `http://localhost:4000`.
