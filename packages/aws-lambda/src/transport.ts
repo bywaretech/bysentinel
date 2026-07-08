@@ -1,5 +1,5 @@
 import type { BySentinelEvent } from "@bywaretech/bysentinel-core";
-import type { ResolvedOptions } from "./types.js";
+import type { ResolvedOptions, WebhookAuth } from "./types.js";
 
 /**
  * Deliver an event to the collector. Always fails silently — a broken
@@ -49,10 +49,14 @@ function deliveryTargets(options: ResolvedOptions, event: BySentinelEvent): Deli
     });
   }
 
-  for (const url of options.delivery.webhooks) {
+  for (const webhook of options.delivery.webhooks) {
     targets.push({
-      url,
+      url: webhook.url,
       headers: {
+        // Caller-supplied static headers have the lowest precedence so they can
+        // never clobber the reserved/auth headers below.
+        ...(webhook.headers ?? {}),
+        ...authHeaders(webhook.auth),
         "content-type": "application/json",
         "x-bysentinel-event-id": event.id,
         "x-bysentinel-delivery": "sdk-webhook",
@@ -61,6 +65,23 @@ function deliveryTargets(options: ResolvedOptions, event: BySentinelEvent): Deli
   }
 
   return targets;
+}
+
+/** Build the auth header(s) for a webhook, if any. */
+function authHeaders(auth: WebhookAuth | undefined): Record<string, string> {
+  if (!auth) return {};
+  switch (auth.type) {
+    case "basic": {
+      const encoded = Buffer.from(`${auth.username}:${auth.password}`, "utf8").toString("base64");
+      return { authorization: `Basic ${encoded}` };
+    }
+    case "bearer":
+      return { authorization: `Bearer ${auth.token}` };
+    case "apiKey":
+      return { [(auth.header ?? "x-api-key").toLowerCase()]: auth.value };
+    default:
+      return {};
+  }
 }
 
 async function sendToTarget(

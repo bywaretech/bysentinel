@@ -1,6 +1,6 @@
 import { DEFAULT_CAPTURE_OPTIONS, DEFAULT_SECURITY_OPTIONS } from "@bywaretech/bysentinel-core";
 import { resolveGitContext } from "./git.js";
-import type { ResolvedOptions, BySentinelOptions } from "./types.js";
+import type { ResolvedOptions, BySentinelOptions, WebhookConfig } from "./types.js";
 
 const env = (key: string): string | undefined => {
   const v = process.env[key];
@@ -14,6 +14,26 @@ const splitList = (value: string | undefined): string[] =>
         .map((item) => item.trim())
         .filter(Boolean)
     : [];
+
+/**
+ * Normalize the mixed `webhooks` array into concrete {@link WebhookConfig}
+ * objects. Legacy plain strings become `{ url }`; entries without a URL are
+ * dropped. Falls back to the env-var URL list when no webhooks were passed.
+ */
+const normalizeWebhooks = (
+  webhooks: Array<string | WebhookConfig> | undefined,
+  fallback: string[],
+): WebhookConfig[] => {
+  const source = webhooks ?? fallback;
+  return source
+    .map((entry): WebhookConfig | undefined => {
+      if (typeof entry === "string") {
+        return entry ? { url: entry } : undefined;
+      }
+      return entry && entry.url ? entry : undefined;
+    })
+    .filter((entry): entry is WebhookConfig => entry !== undefined);
+};
 
 /** Merge user options with environment variables and secure defaults. */
 export function resolveOptions(options: BySentinelOptions): ResolvedOptions {
@@ -42,7 +62,10 @@ export function resolveOptions(options: BySentinelOptions): ResolvedOptions {
       retries: options.delivery?.retries ?? 0,
       maxEventBytes: options.delivery?.maxEventBytes ?? 262_144,
       endpointPath: options.delivery?.endpointPath ?? "/v1/events",
-      webhooks: options.delivery?.webhooks ?? splitList(env("BYSENTINEL_DIRECT_WEBHOOK_URLS")),
+      webhooks: normalizeWebhooks(
+        options.delivery?.webhooks,
+        splitList(env("BYSENTINEL_DIRECT_WEBHOOK_URLS")),
+      ),
     },
     onError:
       options.onError ??

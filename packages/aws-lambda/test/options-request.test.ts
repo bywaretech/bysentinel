@@ -84,8 +84,8 @@ describe("resolveOptions", () => {
     expect(options.collectorUrl).toBe("https://collector.example");
     expect(options.apiKey).toBe("bsk_env");
     expect(options.delivery.webhooks).toEqual([
-      "https://hooks.example/a",
-      "https://hooks.example/b",
+      { url: "https://hooks.example/a" },
+      { url: "https://hooks.example/b" },
     ]);
   });
 

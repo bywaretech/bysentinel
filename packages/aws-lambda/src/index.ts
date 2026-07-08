@@ -4,7 +4,13 @@ export { startRuntime, BySentinel } from "./runtime.js";
 export { resolveOptions } from "./options.js";
 export { resolveGitContext } from "./git.js";
 export type { AwsLambdaContextLike } from "./context.js";
-export type { BySentinelOptions, ResolvedOptions, DeliveryOptions } from "./types.js";
+export type {
+  BySentinelOptions,
+  ResolvedOptions,
+  DeliveryOptions,
+  WebhookConfig,
+  WebhookAuth,
+} from "./types.js";
 
 // Re-export the shared types consumers commonly need.
 export type {
