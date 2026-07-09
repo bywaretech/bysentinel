@@ -25,7 +25,11 @@ export function withBySentinel<F extends AnyAsyncFn>(fn: F, options: BySentinelN
         return await fn(...args);
       } catch (error) {
         if (!isCaptured(error)) {
-          const event = buildEvent({ options: resolved, runtime, error });
+          // Finalize any execution timeline as aborted so the failed step shows.
+          const timeline = scope.timeline?.hasSteps
+            ? (scope.timeline.fail(), scope.timeline.toJSON(true))
+            : undefined;
+          const event = buildEvent({ options: resolved, runtime, error, timeline });
           await dispatch(resolved, event);
         }
         throw error;

@@ -2,8 +2,9 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { createHmac } from "node:crypto";
 import type { BySentinelEvent } from "@bywaretech/bysentinel-core";
 import { withBySentinel } from "../src/withBySentinel.js";
-import { captureException } from "../src/capture.js";
-import { bySentinelExpress } from "../src/express.js";
+import { captureException, captureMessage } from "../src/capture.js";
+import { bySentinelExpress, bySentinelErrorHandler } from "../src/express.js";
+import { BySentinel } from "../src/runtime.js";
 
 function mockFetch() {
   const calls: BySentinelEvent[] = [];
@@ -117,9 +118,113 @@ describe("withBySentinel (node)", () => {
     const expected = createHmac("sha256", "whsec").update(`${ts}.${req.body}`).digest("hex");
     expect(req.headers["x-bysentinel-signature"]).toBe(`sha256=${expected}`);
   });
+
+  it("blocking mode delivers before the rejection settles (no flush needed)", async () => {
+    const { fn } = mockFetch();
+    const wrapped = withBySentinel(
+      async () => {
+        throw new Error("blk");
+      },
+      { ...baseOpts, delivery: { mode: "blocking" } },
+    );
+    await expect(wrapped()).rejects.toThrow("blk");
+    // No flush: blocking awaited delivery before re-throwing.
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not double-capture: same error captured then thrown yields one event", async () => {
+    const { calls } = mockFetch();
+    const err = new Error("once");
+    const wrapped = withBySentinel(async () => {
+      await captureException(err, { feature: "checkout" });
+      throw err; // same instance — wrapper must skip it
+    }, baseOpts);
+
+    await wrapped().catch(() => {});
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.customContext?.feature).toBe("checkout");
+  });
+
+  it("fans out to the collector and multiple webhooks in one go", async () => {
+    const { requests } = mockFetch();
+    const wrapped = withBySentinel(
+      async () => {
+        throw new Error("fan");
+      },
+      {
+        ...baseOpts,
+        delivery: {
+          mode: "blocking",
+          webhooks: ["https://a.example/h", "https://b.example/h"],
+        },
+      },
+    );
+    await wrapped().catch(() => {});
+    expect(requests.map((r) => r.url)).toEqual([
+      "http://collector.local/v1/events",
+      "https://a.example/h",
+      "https://b.example/h",
+    ]);
+  });
+
+  it("attaches an execution timeline and marks it aborted on failure", async () => {
+    const { calls } = mockFetch();
+    const wrapped = withBySentinel(async () => {
+      const rt = BySentinel.start();
+      rt.step("validate");
+      rt.step("charge");
+      throw new Error("mid-charge");
+    }, baseOpts);
+
+    await wrapped().catch(() => {});
+    const tl = calls[0]!.timeline;
+    expect(tl).toBeTruthy();
+    expect(tl!.steps.length).toBe(2);
+    expect(tl!.steps.some((s) => s.status === "failed")).toBe(true);
+  });
+
+  it("detects security signals on the raw request (SSRF)", async () => {
+    const { calls } = mockFetch();
+    const { errorHandler } = bySentinelExpress({
+      ...baseOpts,
+      service: "express",
+      capture: { requestBody: true },
+      delivery: { mode: "blocking" },
+    });
+    const req = {
+      method: "POST",
+      path: "/fetch",
+      body: { url: "http://169.254.169.254/latest/meta-data/" },
+    };
+    errorHandler(new Error("ssrf"), req, {}, () => {});
+    await flush();
+    const signals = calls[0]!.securitySignals ?? [];
+    expect(signals.some((s) => s.type === "ssrf-like-url")).toBe(true);
+  });
+});
+
+describe("captureMessage (node)", () => {
+  it("delivers a standalone Message event with severity", async () => {
+    const { calls } = mockFetch();
+    await captureMessage("provider slow", { severity: "warning", provider: "stripe" }, baseOpts);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.error).toEqual({ type: "Message", message: "provider slow" });
+    expect(calls[0]!.customContext?.severity).toBe("warning");
+    expect(calls[0]!.runtime.provider).toBe("node");
+  });
 });
 
 describe("bySentinelExpress", () => {
+  it("bySentinelErrorHandler is a standalone error handler", async () => {
+    const { calls } = mockFetch();
+    const handler = bySentinelErrorHandler({ ...baseOpts, service: "express" });
+    const next = vi.fn();
+    handler(new Error("standalone"), { method: "GET", path: "/x" }, {}, next);
+    await flush();
+    expect(next).toHaveBeenCalled();
+    expect(calls[0]!.error?.message).toBe("standalone");
+  });
+
   it("captures an unhandled error with request context and calls next(err)", async () => {
     const { calls } = mockFetch();
     const { errorHandler } = bySentinelExpress({ ...baseOpts, service: "express" });
