@@ -1,6 +1,6 @@
 {
   "name": "@bywaretech/bysentinel-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Shared types, redaction/secret-detection engine and fingerprinting for BySentinel",
   "license": "Apache-2.0",
   "repository": {
@@ -32,6 +32,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./sdk": {
+      "types": "./dist/sdk/index.d.ts",
+      "import": "./dist/sdk/index.js"
     }
   },
   "files": [

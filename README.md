@@ -151,6 +151,7 @@ BySentinel is a self-hostable product you can run today.
 | Area                                                                      | Status  |
 | ------------------------------------------------------------------------- | ------- |
 | `@bywaretech/bysentinel-aws-lambda` SDK                                              | Done    |
+| `@bywaretech/bysentinel-node` SDK (Express, Fastify, workers)                        | Done    |
 | Redaction, fingerprinting and security signals                            | Done    |
 | AI prompt, schema validation and heuristic fallback                       | Done    |
 | OpenAI, OpenRouter, Anthropic, DeepSeek, Ollama and custom HTTP providers | Done    |
@@ -438,15 +439,129 @@ Authentication modes:
 | `bearer`    | `Authorization: Bearer <token>`                | `token`                         |
 | `apiKey`    | `<header>: <value>` (default `x-api-key`)       | `value`, optional `header`      |
 
+Add `sign: { secret }` to a webhook for **HMAC signing** — proving authenticity
+and payload integrity, not just possession of a credential. A signed webhook
+carries `x-bysentinel-timestamp`, `x-bysentinel-signature`
+(`sha256=HMAC_SHA256(secret, "{timestamp}.{body}")`) and
+`x-bysentinel-idempotency-key`, the same scheme as the collector's outbound
+webhooks. `auth` and `sign` are independent — use either, both, or neither.
+
 Every direct webhook also receives `content-type: application/json`,
-`x-bysentinel-event-id`, and `x-bysentinel-delivery: sdk-webhook`. These
-reserved headers and the auth header always win over any custom `headers` you
-provide, so they cannot be accidentally overwritten.
+`x-bysentinel-event-id`, and `x-bysentinel-delivery: sdk-webhook`. These reserved
+headers, the auth header and the signature headers always win over any custom
+`headers` you provide, so they cannot be accidentally overwritten. Webhooks are
+delivered in parallel.
 
 This is useful for teams that want BySentinel and an external receiver at the
 same time, or for webhook-only testing before running the dashboard. You can
 also set comma-separated URLs with `BYSENTINEL_DIRECT_WEBHOOK_URLS` (URL-only;
 use the object form in code when a webhook needs authentication).
+
+### Testing locally (no AWS)
+
+`withBySentinel` wraps a plain `(event, context)` function, so you can run it
+from any Node script — no AWS account and no deploy. Point `delivery.webhooks`
+at a free [webhook.site](https://webhook.site) URL and watch the sanitized
+incident arrive in your browser.
+
+Save as `local-test.mjs` and run `node local-test.mjs`:
+
+```js
+import { withBySentinel } from "@bywaretech/bysentinel-aws-lambda";
+
+// Your real handler. It throws here so we generate an incident to inspect.
+function myHandler(event) {
+  if (event.httpMethod !== "POST") {
+    throw new Error(`Invalid HTTP method: ${event.httpMethod}`);
+  }
+  return { statusCode: 200, body: JSON.stringify({ message: "OK" }) };
+}
+
+const handler = withBySentinel(myHandler, {
+  project: "payments-api",
+  environment: "local",
+  // No collector needed for a local test — deliver straight to a webhook.
+  delivery: {
+    timeoutMs: 5000,
+    webhooks: ["https://webhook.site/your-unique-url"],
+  },
+  debug: true, // print internal diagnostics to the console
+});
+
+// Fake an API Gateway event + a Lambda context.
+const event = {
+  httpMethod: "GET", // change to "POST" to see a successful (silent) run
+  path: "/test",
+  queryStringParameters: { foo: "bar" },
+};
+
+const context = {
+  awsRequestId: "local-test-1",
+  functionName: "test-function",
+  functionVersion: "$LATEST",
+  memoryLimitInMB: "512",
+  getRemainingTimeInMillis: () => 30_000, // enables timeout-risk detection
+};
+
+// The wrapped handler awaits delivery, so `await` here waits for the POST to
+// finish before the process exits.
+try {
+  const result = await handler(event, context);
+  console.log("handler ok:", result);
+} catch (err) {
+  console.error("handler threw (expected):", err.message);
+}
+```
+
+What to expect:
+
+- With `httpMethod: "GET"` the handler throws, so the SDK POSTs a **sanitized**
+  event to your webhook.site URL and re-throws — you'll see
+  `handler threw (expected)` and a request on webhook.site.
+- Switch to `httpMethod: "POST"` and the handler returns `200` with **no** event
+  delivered: healthy runs are silent unless a performance risk is detected.
+- To test against a real collector instead, set `collectorUrl` + `apiKey` in
+  place of (or alongside) `delivery.webhooks`.
+
+### Node.js servers (Express, Fastify, workers)
+
+Not on Lambda? Use `@bywaretech/bysentinel-node`. It shares the same redaction,
+event assembly and delivery (auth + HMAC signing) as the Lambda SDK.
+
+```bash
+pnpm add @bywaretech/bysentinel-node
+```
+
+```ts
+import express from "express";
+import { bySentinelExpress, withBySentinel } from "@bywaretech/bysentinel-node";
+
+const app = express();
+app.use(express.json());
+
+const bysentinel = bySentinelExpress({
+  project: "payments-api",
+  environment: "production",
+  service: "express",
+  collectorUrl: process.env.BYSENTINEL_COLLECTOR_URL,
+  apiKey: process.env.BYSENTINEL_API_KEY,
+});
+
+app.use(bysentinel.scope); // early — manual captures inherit request context
+app.post("/pay", async (req, res) => res.json(await createCharge(req.body)));
+app.use(bysentinel.errorHandler); // last — captures unhandled errors
+
+// Or wrap any async function (workers, cron, queue consumers):
+const processJob = withBySentinel(async (job) => handle(job), {
+  project: "billing",
+  environment: "production",
+  service: "worker",
+});
+```
+
+Node events carry `runtime.provider: "node"` and no `lambda` context. Same
+`delivery.webhooks` (auth + `sign`) as above. Full docs live in the
+[package README](packages/node/README.md).
 
 ### Git and release correlation
 
@@ -568,8 +683,10 @@ bysentinel/
     collector/             ingest API, redaction, AI, git + sandbox pipeline, users
     dashboard/             Nuxt 4 dashboard and same-origin API proxy
   packages/
-    core/                  types, redaction, timeline, fingerprint, AI helpers
-    aws-lambda/            Lambda SDK
+    core/                  types, redaction, timeline, fingerprint, AI helpers,
+                           and core/sdk (shared SDK runtime: delivery, signing, capture)
+    aws-lambda/            Lambda SDK (thin adapter over core/sdk)
+    node/                  Node SDK — Express, Fastify, workers (adapter over core/sdk)
     providers/             OpenAI, OpenRouter, Anthropic, DeepSeek, Ollama, custom HTTP
   examples/
     aws-lambda-node/       instrumented Lambda example

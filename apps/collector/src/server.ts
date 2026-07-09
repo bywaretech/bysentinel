@@ -235,7 +235,7 @@ export async function createBySentinelServer(config: CollectorConfig): Promise<B
           project: clean.project,
           environment: clean.environment,
           error: clean.error,
-          functionName: clean.lambda.functionName,
+          functionName: clean.lambda?.functionName,
         });
         const incident = await store.upsertEvent(clean, incidentFingerprint);
         const aiSettings = await store.getAISettings(config.ai);
@@ -377,8 +377,7 @@ function normalizeEvent(input: unknown): BySentinelEvent {
     !event.timestamp ||
     !event.project ||
     !event.environment ||
-    !event.runtime ||
-    !event.lambda
+    !event.runtime
   ) {
     throw new Error("invalid BySentinel event");
   }

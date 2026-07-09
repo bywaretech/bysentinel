@@ -1,7 +1,15 @@
-import { consumeColdStart, finishPerf, startPerf, type AwsLambdaContextLike } from "./context.js";
+import {
+  AWS_RUNTIME,
+  consumeColdStart,
+  extractLambdaContext,
+  finishPerf,
+  startPerf,
+  type AwsLambdaContextLike,
+} from "./context.js";
 import { isCaptured } from "./dedupe.js";
 import { buildEvent } from "./event.js";
 import { resolveOptions } from "./options.js";
+import { extractRequest } from "./request.js";
 import { runWithScope, type ActiveScope } from "./scope.js";
 import { deliver } from "./transport.js";
 import type { BySentinelOptions } from "./types.js";
@@ -33,11 +41,14 @@ export function withBySentinel<
   return async function bySentinelHandler(event, context) {
     const coldStart = consumeColdStart();
     const probe = startPerf(context);
+    const request = extractRequest(event, resolved);
+    const lambda = extractLambdaContext(context, coldStart);
 
     const scope: ActiveScope = {
       options: resolved,
-      lambdaEvent: event,
-      lambdaContext: context,
+      runtime: AWS_RUNTIME,
+      request,
+      lambda,
       coldStart,
     };
 
@@ -52,9 +63,9 @@ export function withBySentinel<
           if (performance.timeoutRisk) {
             const perfEvent = buildEvent({
               options: resolved,
-              lambdaEvent: event,
-              lambdaContext: context,
-              coldStart,
+              runtime: AWS_RUNTIME,
+              lambda,
+              request,
               performance,
               timeline: scope.timeline?.hasSteps ? scope.timeline.finish() : undefined,
               customContext: { kind: "performance-warning" },
@@ -80,9 +91,9 @@ export function withBySentinel<
 
         const errorEvent = buildEvent({
           options: resolved,
-          lambdaEvent: event,
-          lambdaContext: context,
-          coldStart,
+          runtime: AWS_RUNTIME,
+          lambda,
+          request,
           error,
           performance,
           timeline,

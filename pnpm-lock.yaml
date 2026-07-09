@@ -124,6 +124,19 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0)
 
+  packages/node:
+    dependencies:
+      '@bywaretech/bysentinel-core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.6(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0)
+
   packages/providers:
     dependencies:
       '@bywaretech/bysentinel-core':

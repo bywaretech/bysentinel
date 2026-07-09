@@ -111,10 +111,34 @@ Authentication modes (all optional — a webhook can have no `auth` at all):
 | `bearer`    | `Authorization: Bearer <token>`           | `token`                    |
 | `apiKey`    | `<header>: <value>` (default `x-api-key`) | `value`, optional `header` |
 
+### HMAC-signed webhooks
+
+Add `sign` to a webhook to prove authenticity **and** integrity (that the payload
+wasn't tampered with) — not just possession of a credential:
+
+```ts
+{
+  url: "https://ops.example.com/hook",
+  sign: { secret: process.env.WEBHOOK_SECRET! },
+}
+```
+
+A signed webhook additionally carries:
+
+- `x-bysentinel-timestamp` — unix seconds
+- `x-bysentinel-signature` — `sha256=HMAC_SHA256(secret, "{timestamp}.{body}")`
+- `x-bysentinel-idempotency-key` — a UUID to drop duplicate deliveries
+
+This is the **same scheme** the collector uses for its outbound webhooks, so a
+receiver verifies both identically: recompute the HMAC over `${timestamp}.${body}`
+with a constant-time compare, and reject stale timestamps (replay protection).
+`auth` and `sign` are independent — use either, both, or neither.
+
 All webhooks are delivered in parallel. Each also receives
 `content-type: application/json`, `x-bysentinel-event-id`, and
-`x-bysentinel-delivery: sdk-webhook`. These reserved headers and the auth header
-always take precedence over any custom `headers` you provide.
+`x-bysentinel-delivery: sdk-webhook`. These reserved headers, the auth header and
+the signature headers always take precedence over any custom `headers` you
+provide.
 
 This sends the same sanitized event to every target, e.g.:
 
@@ -127,6 +151,77 @@ https://ops.example.com/hooks/bysentinel
 For webhook-only usage, omit `collectorUrl` and keep `delivery.webhooks`.
 Comma-separated URLs can also be set with `BYSENTINEL_DIRECT_WEBHOOK_URLS`
 (URL-only; use the object form in code when a webhook needs authentication).
+
+## Testing locally (no AWS)
+
+`withBySentinel` just wraps a plain `(event, context)` function, so you can
+exercise it from any Node script — no AWS account and no deploy. Point
+`delivery.webhooks` at a free [webhook.site](https://webhook.site) URL and watch
+the sanitized incident arrive in your browser.
+
+Save this as `local-test.mjs` and run `node local-test.mjs`:
+
+```js
+import { withBySentinel } from "@bywaretech/bysentinel-aws-lambda";
+
+// Your real handler. It throws here so we generate an incident to inspect.
+function myHandler(event) {
+  if (event.httpMethod !== "POST") {
+    throw new Error(`Invalid HTTP method: ${event.httpMethod}`);
+  }
+  return { statusCode: 200, body: JSON.stringify({ message: "OK" }) };
+}
+
+const handler = withBySentinel(myHandler, {
+  project: "payments-api",
+  environment: "local",
+  // No collector needed for a local test — deliver straight to a webhook.
+  delivery: {
+    timeoutMs: 5000,
+    webhooks: ["https://webhook.site/your-unique-url"],
+  },
+  debug: true, // print internal diagnostics to the console
+});
+
+// Fake an API Gateway event + a Lambda context.
+const event = {
+  httpMethod: "GET", // change to "POST" to see a successful (silent) run
+  path: "/test",
+  queryStringParameters: { foo: "bar" },
+};
+
+const context = {
+  awsRequestId: "local-test-1",
+  functionName: "test-function",
+  functionVersion: "$LATEST",
+  memoryLimitInMB: "512",
+  getRemainingTimeInMillis: () => 30_000, // enables timeout-risk detection
+};
+
+// The wrapped handler awaits delivery, so `await` here waits for the POST to
+// finish before the process exits.
+try {
+  const result = await handler(event, context);
+  console.log("handler ok:", result);
+} catch (err) {
+  console.error("handler threw (expected):", err.message);
+}
+```
+
+What to expect:
+
+- With `httpMethod: "GET"` the handler throws, so the SDK POSTs a **sanitized**
+  event to your webhook.site URL and then re-throws — you'll see
+  `handler threw (expected)` and a request appear on webhook.site.
+- Switch the event to `httpMethod: "POST"` and the handler returns `200` with
+  **no** event delivered: healthy runs are silent unless a performance risk is
+  detected.
+- CommonJS project? Use `require(...)` and drop the top-level `await`, or keep
+  the `.mjs` extension shown above. If your `package.json` has
+  `"type": "module"`, a plain `.js` file works too.
+
+The same pattern works with a real collector: set `collectorUrl` + `apiKey`
+instead of (or alongside) `delivery.webhooks`.
 
 ## Manual capture
 
