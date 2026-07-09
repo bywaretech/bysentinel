@@ -8,10 +8,16 @@ breaking your code.
 It shares its redaction, event assembly and delivery (auth + HMAC signing) with
 the AWS Lambda SDK, so behavior is identical across runtimes.
 
+> **On AWS Lambda?** Use
+> [`@bywaretech/bysentinel-aws-lambda`](https://www.npmjs.com/package/@bywaretech/bysentinel-aws-lambda)
+> instead — it adds the Lambda `event`/`context`, cold-start and timeout-risk
+> handling. See the [monorepo README](https://github.com/bywaretech/bysentinel#readme).
+
 ## Install
 
 ```bash
 pnpm add @bywaretech/bysentinel-node
+# npm i @bywaretech/bysentinel-node
 ```
 
 ## Wrap any async function
@@ -148,3 +154,13 @@ Bodies and headers are **off by default**. `security.strictMode` guarantees they
 never leave the process. PII, secrets and payment data are redacted before any
 network delivery, and security signals (SSRF, secret-in-log, etc.) are detected
 on the raw request before redaction.
+
+## Related packages
+
+| Package | Use it for |
+| ------- | ---------- |
+| [`@bywaretech/bysentinel-aws-lambda`](https://www.npmjs.com/package/@bywaretech/bysentinel-aws-lambda) | AWS Lambda handlers (adds cold-start + timeout-risk detection). |
+| [`@bywaretech/bysentinel-core`](https://www.npmjs.com/package/@bywaretech/bysentinel-core) | Shared types, redaction engine, webhook signing, and the `core/sdk` runtime this package is built on. |
+
+Full docs, self-hosting and the dashboard live in the
+[monorepo README](https://github.com/bywaretech/bysentinel#readme).

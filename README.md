@@ -166,15 +166,19 @@ BySentinel is a self-hostable product you can run today.
 ## Architecture
 
 ```txt
-AWS Lambda ── @bywaretech/bysentinel-aws-lambda ──► Collector API (/v1/events)
-                                              │  redacts, groups by fingerprint
-                                              │  runs AI provider or heuristic
-                                              ▼
+AWS Lambda ── @bywaretech/bysentinel-aws-lambda ─┐
+                                                 ├─► Collector API (/v1/events)
+Node server ── @bywaretech/bysentinel-node ──────┘  │  redacts, groups by fingerprint
+(Express/Fastify/worker)                            │  runs AI provider or heuristic
+                                                    ▼
    Browser ──►  Dashboard (Nuxt)  ──proxy──►  Collector admin API
                                               │        │
                           clone repo at SHA ◄─┘        └─► signed webhook ──► your automation
                           reproduce on  ────────────►  ministack sandbox
 ```
+
+Both SDKs can also fan the sanitized event straight to your own webhooks
+(optionally authenticated and HMAC-signed) — see [Direct SDK webhooks](#direct-sdk-webhooks).
 
 Three services ship in Docker Compose: **collector** (ingest, redaction, AI
 orchestration, git/sandbox pipeline), **dashboard** (Nuxt UI + same-origin API
@@ -234,17 +238,26 @@ reachable URL into the dashboard, for example:
 http://host.docker.internal:11434
 ```
 
-### 3. Install the Lambda SDK
+### 3. Install an SDK
+
+Pick the SDK for your runtime — both share the same redaction, delivery, auth and
+HMAC signing, and report to the same collector:
+
+| Runtime | Package | Docs |
+| ------- | ------- | ---- |
+| AWS Lambda | `@bywaretech/bysentinel-aws-lambda` | [README](packages/aws-lambda/README.md) |
+| Express, Fastify, workers, cron, plain functions | `@bywaretech/bysentinel-node` | [README](packages/node/README.md) |
 
 ```bash
-npm install @bywaretech/bysentinel-aws-lambda
-```
-
-or:
-
-```bash
+# AWS Lambda
 pnpm add @bywaretech/bysentinel-aws-lambda
+
+# Node servers / workers
+pnpm add @bywaretech/bysentinel-node
 ```
+
+The Quick Start below uses the Lambda SDK; for the Node SDK jump to
+[Node.js servers](#nodejs-servers-express-fastify-workers).
 
 ### 4. Configure your Lambda
 
@@ -738,6 +751,7 @@ See [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
 
 - Local builds, Docker images and CI target Node.js 24+.
 - The AWS Lambda SDK supports Lambda Node.js 20+ runtimes.
+- The Node SDK targets Node.js 18+ (uses global `fetch` and `AsyncLocalStorage`).
 
 ## Roadmap
 

@@ -4,10 +4,17 @@ BySentinel SDK for AWS Lambda handlers. Wraps your handler, captures sanitized
 incident data on failure, and delivers it to a collector — without ever breaking
 your function.
 
+> **Not on Lambda?** For Express, Fastify, plain functions, workers or cron jobs,
+> use [`@bywaretech/bysentinel-node`](https://www.npmjs.com/package/@bywaretech/bysentinel-node)
+> — same redaction, delivery, auth and HMAC signing, different entry points.
+> See the [monorepo README](https://github.com/bywaretech/bysentinel#readme) for
+> the full picture.
+
 ## Install
 
 ```bash
 pnpm add @bywaretech/bysentinel-aws-lambda
+# npm i @bywaretech/bysentinel-aws-lambda
 ```
 
 ## `withBySentinel(handler, options)`
@@ -316,3 +323,13 @@ See [docs/SECURITY.md](../../docs/SECURITY.md).
 - **Bounded delivery.** Sends are time-capped by `delivery.timeoutMs`.
 - **Sanitized by default.** `event.sanitized` is always `true`; the collector
   rejects unsanitized events.
+
+## Related packages
+
+| Package | Use it for |
+| ------- | ---------- |
+| [`@bywaretech/bysentinel-node`](https://www.npmjs.com/package/@bywaretech/bysentinel-node) | Express, Fastify, plain functions, workers, cron — anything that isn't Lambda. |
+| [`@bywaretech/bysentinel-core`](https://www.npmjs.com/package/@bywaretech/bysentinel-core) | Shared types, redaction engine, webhook signing, and the `core/sdk` runtime both SDKs are built on. |
+
+Full docs, self-hosting and the dashboard live in the
+[monorepo README](https://github.com/bywaretech/bysentinel#readme).
