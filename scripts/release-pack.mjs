@@ -8,6 +8,7 @@ const packages = [
   { name: "@bywaretech/bysentinel-core", dir: "packages/core" },
   { name: "@bywaretech/bysentinel-providers", dir: "packages/providers" },
   { name: "@bywaretech/bysentinel-aws-lambda", dir: "packages/aws-lambda" },
+  { name: "@bywaretech/bysentinel-node", dir: "packages/node" },
 ];
 
 await rm(outDir, { recursive: true, force: true });

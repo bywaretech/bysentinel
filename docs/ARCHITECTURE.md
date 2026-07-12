@@ -24,8 +24,9 @@ External alerting / automation
 
 | Package                  | Responsibility                                                                             |
 | ------------------------ | ------------------------------------------------------------------------------------------ |
-| `@bywaretech/bysentinel-aws-lambda` | Handler wrapper, manual capture, timeline, Git metadata, bounded delivery.                 |
-| `@bywaretech/bysentinel-core`       | Types, redaction, security signals, fingerprinting, timeline and AI prompt/schema helpers. |
+| `@bywaretech/bysentinel-aws-lambda` | Lambda handler wrapper — a thin adapter over `core/sdk`.                                    |
+| `@bywaretech/bysentinel-node`       | Node SDK for Express, Fastify and plain functions — a thin adapter over `core/sdk`.        |
+| `@bywaretech/bysentinel-core`       | Types, redaction, security signals, fingerprinting, timeline, AI helpers, webhook signing. Its `core/sdk` subpath holds the shared SDK runtime (option resolution, event assembly, delivery with auth + HMAC signing, scoping, manual capture) that every adapter builds on. |
 | `@bywaretech/bysentinel-providers`  | Provider transports for OpenAI, OpenRouter, Anthropic, Ollama and custom HTTP.             |
 | `@bywaretech/bysentinel-collector`  | Ingest API, file storage, AI settings, analysis and webhooks.                              |
 | `@bywaretech/bysentinel-dashboard`  | Nuxt dashboard and same-origin Nitro proxy to the collector.                               |

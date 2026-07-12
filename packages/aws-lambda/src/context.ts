@@ -1,4 +1,12 @@
-import type { LambdaContext, PerformanceInfo } from "@bywaretech/bysentinel-core";
+import type { LambdaContext, PerformanceInfo, RuntimeInfo } from "@bywaretech/bysentinel-core";
+
+/** Runtime descriptor for events produced by this Lambda adapter. */
+export const AWS_RUNTIME: RuntimeInfo = {
+  provider: "aws",
+  service: "lambda",
+  language: "nodejs",
+  version: process.version,
+};
 
 /** AWS Lambda `Context` — narrowed to what we use (avoids a hard dep). */
 export interface AwsLambdaContextLike {

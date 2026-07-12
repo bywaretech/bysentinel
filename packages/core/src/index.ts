@@ -44,5 +44,12 @@ export type {
   AnalyzeOutcome,
 } from "./providers/types.js";
 
+// Webhook signing (shared by the collector and the SDK's direct webhooks)
+export {
+  signWebhookPayload,
+  buildWebhookSignatureHeaders,
+  type WebhookSignatureHeaders,
+} from "./webhooks/sign.js";
+
 // Utilities
 export { newEventId, nowIso } from "./util/id.js";

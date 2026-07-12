@@ -1,4 +1,5 @@
-import { createHmac, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { signWebhookPayload } from "@bywaretech/bysentinel-core";
 import type { IncidentRecord, StoredAnalysis } from "./storage.js";
 
 export interface WebhookConfig {
@@ -18,9 +19,7 @@ export async function deliverWebhooks(config: WebhookConfig, payload: WebhookPay
   await Promise.allSettled(config.urls.map((url) => deliverWebhook(url, config, payload)));
 }
 
-export function signWebhookPayload(secret: string, timestamp: string, body: string): string {
-  return createHmac("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
-}
+export { signWebhookPayload };
 
 async function deliverWebhook(url: string, config: WebhookConfig, payload: WebhookPayload): Promise<void> {
   const body = JSON.stringify(payload);

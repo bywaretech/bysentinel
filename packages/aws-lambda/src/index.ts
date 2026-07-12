@@ -10,6 +10,7 @@ export type {
   DeliveryOptions,
   WebhookConfig,
   WebhookAuth,
+  WebhookSign,
 } from "./types.js";
 
 // Re-export the shared types consumers commonly need.

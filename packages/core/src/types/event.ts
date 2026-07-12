@@ -30,9 +30,13 @@ export interface SecuritySignal {
 }
 
 export interface RuntimeInfo {
-  provider: "aws";
-  service: "lambda";
-  language: "nodejs";
+  /** Platform provider, e.g. "aws", "node", "vercel", "cloudflare". */
+  provider: string;
+  /** Service/runtime, e.g. "lambda", "express", "fastify", "http". */
+  service: string;
+  /** Language runtime, e.g. "nodejs". */
+  language: string;
+  /** Runtime version string (e.g. `process.version`). */
   version: string;
 }
 
@@ -84,7 +88,8 @@ export interface BySentinelEvent {
   release?: string;
 
   runtime: RuntimeInfo;
-  lambda: LambdaContext;
+  /** AWS Lambda execution context. Absent for non-Lambda runtimes. */
+  lambda?: LambdaContext;
   git?: GitContext;
 
   error?: ErrorInfo;

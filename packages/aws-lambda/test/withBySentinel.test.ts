@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { createHmac } from "node:crypto";
 import type { BySentinelEvent } from "@bywaretech/bysentinel-core";
 import { withBySentinel } from "../src/withBySentinel.js";
 import { captureException } from "../src/capture.js";
@@ -14,9 +15,9 @@ const baseOpts = {
 
 function mockFetch() {
   const calls: BySentinelEvent[] = [];
-  const requests: Array<{ url: string; headers: Record<string, string> }> = [];
+  const requests: Array<{ url: string; headers: Record<string, string>; body: string }> = [];
   const fn = vi.fn(async (_url: string, init: any) => {
-    requests.push({ url: _url, headers: init.headers });
+    requests.push({ url: _url, headers: init.headers, body: init.body });
     calls.push(JSON.parse(init.body));
     return { ok: true, status: 200 } as Response;
   });
@@ -49,8 +50,8 @@ describe("withBySentinel", () => {
     expect(evt.error?.type).toBe("Error");
     expect(evt.error?.message).toBe("boom");
     expect(evt.sanitized).toBe(true);
-    expect(evt.lambda.functionName).toBe("pay");
-    expect(evt.lambda.requestId).toBe("req-123");
+    expect(evt.lambda!.functionName).toBe("pay");
+    expect(evt.lambda!.requestId).toBe("req-123");
   });
 
   it("returns the handler result unchanged on success", async () => {
@@ -75,8 +76,8 @@ describe("withBySentinel", () => {
     await handler({}, ctx).catch(() => {});
     await handler({}, ctx).catch(() => {});
 
-    expect(calls[0]!.lambda.coldStart).toBe(true);
-    expect(calls[1]!.lambda.coldStart).toBe(false);
+    expect(calls[0]!.lambda!.coldStart).toBe(true);
+    expect(calls[1]!.lambda!.coldStart).toBe(false);
   });
 
   it("redacts secrets in the request body when body capture is enabled", async () => {
@@ -281,6 +282,44 @@ describe("withBySentinel", () => {
     ]);
     expect(requests[0]!.headers.authorization).toBeUndefined();
     expect(requests[1]!.headers.authorization).toBe("Bearer t");
+  });
+
+  it("HMAC-signs a webhook and the signature verifies against the exact body", async () => {
+    const { requests } = mockFetch();
+    const handler = withBySentinel(
+      async () => {
+        throw new Error("signed");
+      },
+      {
+        project: "payments-api",
+        environment: "test",
+        delivery: {
+          webhooks: [
+            { url: "https://webhook.example/signed", sign: { secret: "whsec_test" } },
+            { url: "https://webhook.example/unsigned" },
+          ],
+        },
+      },
+    );
+
+    await handler({}, ctx).catch(() => {});
+
+    const signed = requests.find((r) => r.url === "https://webhook.example/signed")!;
+    const timestamp = signed.headers["x-bysentinel-timestamp"];
+    const signature = signed.headers["x-bysentinel-signature"];
+    expect(timestamp).toMatch(/^\d+$/);
+    expect(signed.headers["x-bysentinel-idempotency-key"]).toMatch(/^[0-9a-f-]{36}$/);
+
+    // The receiver recomputes the HMAC over `${timestamp}.${body}` and compares.
+    const expected = createHmac("sha256", "whsec_test")
+      .update(`${timestamp}.${signed.body}`)
+      .digest("hex");
+    expect(signature).toBe(`sha256=${expected}`);
+
+    // An unsigned webhook gets no signature headers.
+    const unsigned = requests.find((r) => r.url === "https://webhook.example/unsigned")!;
+    expect(unsigned.headers["x-bysentinel-signature"]).toBeUndefined();
+    expect(unsigned.headers["x-bysentinel-timestamp"]).toBeUndefined();
   });
 
   it("can deliver to direct webhooks without a collector", async () => {
